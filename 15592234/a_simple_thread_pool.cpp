@@ -5,7 +5,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <functional>
 #include <future>
 #include <mutex>
@@ -21,7 +20,6 @@ using std::chrono::milliseconds;
 using std::chrono::minutes;
 using std::chrono::steady_clock;
 using std::chrono::time_point;
-using std::condition_variable;
 using std::future;
 using std::lock_guard;
 using std::memory_order_acquire;
@@ -90,7 +88,6 @@ class Lockwise_Queue {
             _af_.clear(memory_order_release);
         }
     } mutable _m_;
-    condition_variable _cv_;
     queue<T> _q_;
 
  public:
@@ -99,13 +96,11 @@ class Lockwise_Queue {
     void push(const T& element) {
         lock_guard<Spinlock_Mutex> lk(_m_);
         _q_.push(std::move(element));
-        _cv_.notify_one();
     }
 
     void push(T&& element) {
         lock_guard<Spinlock_Mutex> lk(_m_);
         _q_.push(std::move(element));
-        _cv_.notify_one();
     }
 
     bool pop(T& element) {
