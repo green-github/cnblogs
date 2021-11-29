@@ -91,13 +91,6 @@ class Lockwise_Queue {
     queue<T> _q_;
 
  public:
-    Lockwise_Queue() {}
-
-    void push(const T& element) {
-        lock_guard<Spinlock_Mutex> lk(_m_);
-        _q_.push(std::move(element));
-    }
-
     void push(T&& element) {
         lock_guard<Spinlock_Mutex> lk(_m_);
         _q_.push(std::move(element));
@@ -115,6 +108,11 @@ class Lockwise_Queue {
     bool empty() const {
         lock_guard<Spinlock_Mutex> lk(_m_);
         return _q_.empty();
+    }
+
+    size_t size() const {
+        lock_guard<Spinlock_Mutex> lk(_m_);
+        return _q_.size();
     }
 
 };
@@ -172,13 +170,24 @@ class Thread_Pool {
     thread* _workers_;
 
     void work() {
+        Task_Wrapper task;
         while (!_done_.load(memory_order_acquire)) {
-            Task_Wrapper task;
             if (_queue_.pop(task))
                 task();
             else
                 std::this_thread::yield();
         }
+    }
+
+    void stop() {
+        while (!_queue_.empty())
+            std::this_thread::yield();
+        _done_.store(true, memory_order_release);
+        for (unsigned i = 0; i < _workersize_; ++i) {
+            if (_workers_[i].joinable())
+                _workers_[i].join();
+        }
+        delete[] _workers_;
     }
 
   public:
@@ -190,22 +199,12 @@ class Thread_Pool {
                 _workers_[i] = thread(&Thread_Pool::work, this);
             }
         } catch (...) {
-            _done_.store(true, memory_order_release);
-            for (unsigned i = 0; i < _workersize_; ++i) {
-                if (_workers_[i].joinable())
-                    _workers_[i].join();
-            }
-            delete[] _workers_;
+            stop();
             throw;
         }
     }
     ~Thread_Pool() {
-        _done_.store(true, memory_order_release);
-        for (unsigned i = 0; i < _workersize_; ++i) {
-            if (_workers_[i].joinable())
-                _workers_[i].join();
-        }
-        delete[] _workers_;
+        stop();
     }
 
     template<class Callable>
@@ -332,7 +331,7 @@ int main() {
             }
         });
 
-        std::printf("\n......Ready......\n");
+        std::printf("\nReady......\n");
         std::this_thread::sleep_for(milliseconds(1000));
         go.store(true, memory_order_release);
 
