@@ -331,7 +331,7 @@ int main() {
             }
         });
 
-        std::printf("\nReady......\n");
+        std::printf("\nReady...\n");
         std::this_thread::sleep_for(milliseconds(1000));
         go.store(true, memory_order_release);
 
