@@ -1,7 +1,6 @@
 // a_simple_thread_pool.cpp
 
 #include <cstdio>
-#include <cstdlib>
 
 #include <atomic>
 #include <chrono>
@@ -27,7 +26,6 @@ using std::memory_order_release;
 using std::packaged_task;
 using std::queue;
 using std::thread;
-
 
 
 void shoot() {
@@ -77,7 +75,7 @@ class Archer {
 template<class T>
 class Lockwise_Queue {
 
- private:
+  private:
     struct Spinlock_Mutex {
         atomic_flag _af_;
         Spinlock_Mutex() : _af_(false) {}
@@ -90,7 +88,7 @@ class Lockwise_Queue {
     } mutable _m_;
     queue<T> _q_;
 
- public:
+  public:
     void push(T&& element) {
         lock_guard<Spinlock_Mutex> lk(_m_);
         _q_.push(std::move(element));
@@ -217,7 +215,6 @@ class Thread_Pool {
     }
 
 };
-
 
 
 int main() {
