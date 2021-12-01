@@ -33,23 +33,23 @@ using std::unique_lock;
 
 
 void shoot() {
-    std::printf("\n\t[Free Function] Let an arrow fly...\n");
+    std::fprintf(stdout, "\n\t[Free Function] Let an arrow fly...\n");
 }
 
 
 bool shoot(long n) {
-    std::printf("\n\t[Free Function] Let %ld arrows fly...\n", n);
+    std::fprintf(stdout, "\n\t[Free Function] Let %ld arrows fly...\n", n);
     return false;
 }
 
 
 auto shootAnarrow = [] {
-    std::printf("\n\t[Lambda] Let an arrow fly...\n");
+    std::fprintf(stdout, "\n\t[Lambda] Let an arrow fly...\n");
 };
 
 
 auto shootNarrows = [](long n) -> bool {
-    std::printf("\n\t[Lambda] Let %ld arrows fly...\n", n);
+    std::fprintf(stdout, "\n\t[Lambda] Let %ld arrows fly...\n", n);
     return true;
 };
 
@@ -58,17 +58,17 @@ class Archer {
 
   public:
     void operator()() {
-        std::printf("\n\t[Functor] Let an arrow fly...\n");
+        std::fprintf(stdout, "\n\t[Functor] Let an arrow fly...\n");
     }
     bool operator()(long n) {
-        std::printf("\n\t[Functor] Let %ld arrows fly...\n", n);
+        std::fprintf(stdout, "\n\t[Functor] Let %ld arrows fly...\n", n);
         return false;
     }
     void shoot() {
-        std::printf("\n\t[Member Function] Let an arrow fly...\n");
+        std::fprintf(stdout, "\n\t[Member Function] Let an arrow fly...\n");
     }
     bool shoot(long n) {
-        std::printf("\n\t[Member Function] Let %ld arrows fly...\n", n);
+        std::fprintf(stdout, "\n\t[Member Function] Let %ld arrows fly...\n", n);
         return true;
     }
 
@@ -174,7 +174,7 @@ class Thread_Pool {
         size_t remained = _queue_.size();
         while (!_queue_.empty())
             std::this_thread::yield();
-        std::printf("\n%zu tasks remain before destructing pool...\n", remained);
+        std::fprintf(stderr, "\n%zu tasks remain before destructing pool...\n", remained);
         _done_.store(true, memory_order_release);
         for (unsigned i = 0; i < _workersize_; ++i)
             _queue_.push([] {});
@@ -324,7 +324,7 @@ int main() {
             }
         });
 
-        std::printf("\nReady...\n");
+        std::fprintf(stdout, "\nReady...Go\n\n\tWait a moment...\n");
         std::this_thread::sleep_for(milliseconds(1000));
         go.store(true, memory_order_release);
 
@@ -341,9 +341,9 @@ int main() {
     }
 
     time_point<steady_clock> end = steady_clock::now();
-    std::printf("\nTook %.3f seconds.\n", duration<double>(end - start).count());
+    std::fprintf(stderr, "\nTook %.3f seconds.\n", duration<double>(end - start).count());
 
-    std::printf("\nBye...\n");
+    std::fprintf(stdout, "\nBye...\n");
     return 0;
 }
 
