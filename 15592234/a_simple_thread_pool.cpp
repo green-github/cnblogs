@@ -15,6 +15,7 @@
 
 using std::atomic;
 using std::atomic_flag;
+using std::chrono::duration;
 using std::chrono::milliseconds;
 using std::chrono::minutes;
 using std::chrono::steady_clock;
@@ -178,8 +179,10 @@ class Thread_Pool {
     }
 
     void stop() {
+        size_t remained = _queue_.size();
         while (!_queue_.empty())
             std::this_thread::yield();
+        std::printf("\n%zu tasks remain before destructing pool...\n", remained);
         _done_.store(true, memory_order_release);
         for (unsigned i = 0; i < _workersize_; ++i) {
             if (_workers_[i].joinable())
@@ -218,10 +221,9 @@ class Thread_Pool {
 
 
 int main() {
-
     atomic<bool> go(false);
-    time_point<steady_clock> start = steady_clock::now();
     minutes PERIOD(1);
+    time_point<steady_clock> start = steady_clock::now();
 
     {
         Thread_Pool pool;
@@ -343,6 +345,9 @@ int main() {
         t2.join();
         t1.join();
     }
+
+    time_point<steady_clock> end = steady_clock::now();
+    std::printf("\nTook %.3f seconds.\n", duration<double>(end - start).count());
 
     std::printf("\nBye...\n");
     return 0;
