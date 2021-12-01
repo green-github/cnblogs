@@ -174,7 +174,7 @@ class Thread_Pool {
         size_t remained = _queue_.size();
         while (!_queue_.empty())
             std::this_thread::yield();
-        std::fprintf(stderr, "\n%zu tasks remain before destructing pool...\n", remained);
+        std::fprintf(stderr, "\n%zu tasks remain before destructing pool.\n", remained);
         _done_.store(true, memory_order_release);
         for (unsigned i = 0; i < _workersize_; ++i)
             _queue_.push([] {});
@@ -324,7 +324,7 @@ int main() {
             }
         });
 
-        std::fprintf(stdout, "\nReady...Go\n\n\tWait a moment...\n");
+        std::fprintf(stderr, "\nReady...Go\n\nWait a moment...\n");
         std::this_thread::sleep_for(milliseconds(1000));
         go.store(true, memory_order_release);
 
@@ -343,7 +343,7 @@ int main() {
     time_point<steady_clock> end = steady_clock::now();
     std::fprintf(stderr, "\nTook %.3f seconds.\n", duration<double>(end - start).count());
 
-    std::fprintf(stdout, "\nBye...\n");
+    std::fprintf(stderr, "\nBye...\n");
     return 0;
 }
 
