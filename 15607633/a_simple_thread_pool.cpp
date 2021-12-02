@@ -37,8 +37,8 @@ void shoot() {
 }
 
 
-bool shoot(long n) {
-    std::fprintf(stdout, "\n\t[Free Function] Let %ld arrows fly...\n", n);
+bool shoot(size_t n) {
+    std::fprintf(stdout, "\n\t[Free Function] Let %zu arrows fly...\n", n);
     return false;
 }
 
@@ -48,8 +48,8 @@ auto shootAnarrow = [] {
 };
 
 
-auto shootNarrows = [](long n) -> bool {
-    std::fprintf(stdout, "\n\t[Lambda] Let %ld arrows fly...\n", n);
+auto shootNarrows = [](size_t n) -> bool {
+    std::fprintf(stdout, "\n\t[Lambda] Let %zu arrows fly...\n", n);
     return true;
 };
 
@@ -60,15 +60,15 @@ class Archer {
     void operator()() {
         std::fprintf(stdout, "\n\t[Functor] Let an arrow fly...\n");
     }
-    bool operator()(long n) {
-        std::fprintf(stdout, "\n\t[Functor] Let %ld arrows fly...\n", n);
+    bool operator()(size_t n) {
+        std::fprintf(stdout, "\n\t[Functor] Let %zu arrows fly...\n", n);
         return false;
     }
     void shoot() {
         std::fprintf(stdout, "\n\t[Member Function] Let an arrow fly...\n");
     }
-    bool shoot(long n) {
-        std::fprintf(stdout, "\n\t[Member Function] Let %ld arrows fly...\n", n);
+    bool shoot(size_t n) {
+        std::fprintf(stdout, "\n\t[Member Function] Let %zu arrows fly...\n", n);
         return true;
     }
 
@@ -222,104 +222,114 @@ int main() {
     {
         Thread_Pool pool;
 
-        thread t1([&go, &pool, &PERIOD, start] {
+        size_t c1 = 0;
+        thread t1([&go, &pool, &c1, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
             void (*task)() = shoot;
-            for (long x = 0; steady_clock::now() - start <= PERIOD; ++x) {
+            for (c1 = 0; steady_clock::now() - start <= PERIOD; ++c1) {
                 pool.submit(task);
                 //pool.submit(std::bind<void(*)()>(shoot));
                 std::this_thread::yield();
             }
         });
 
-        thread t2([&go, &pool, &PERIOD, start] {
+        size_t c2 = 0;
+        thread t2([&go, &pool, &c2, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
-            bool (*task)(long) = shoot;
-            for (long x = 2; steady_clock::now() - start <= PERIOD; ++x) {
-                future<bool> r = pool.submit(std::bind(task, x));
-                //future<bool> r = pool.submit(std::bind<bool(*)(long)>(shoot, x));
+            bool (*task)(size_t) = shoot;
+            for (c2 = 2; steady_clock::now() - start <= PERIOD; ++c2) {
+                future<bool> r = pool.submit(std::bind(task, c2));
+                //future<bool> r = pool.submit(std::bind<bool(*)(size_t)>(shoot, c2));
                 std::this_thread::yield();
             }
         });
 
-        thread t3([&go, &pool, &PERIOD, start] {
+        size_t c3 = 0;
+        thread t3([&go, &pool, &c3, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
-            for (long x = 0; steady_clock::now() - start <= PERIOD; ++x) {
+            for (c3 = 0; steady_clock::now() - start <= PERIOD; ++c3) {
                 pool.submit(shootAnarrow);
                 std::this_thread::yield();
             }
         });
 
-        thread t4([&go, &pool, &PERIOD, start] {
+        size_t c4 = 0;
+        thread t4([&go, &pool, &c4, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
-            for (long x = 2; steady_clock::now() - start <= PERIOD; ++x) {
-                future<bool> r = pool.submit(std::bind(shootNarrows, x));
+            for (c4 = 2; steady_clock::now() - start <= PERIOD; ++c4) {
+                future<bool> r = pool.submit(std::bind(shootNarrows, c4));
                 std::this_thread::yield();
             }
         });
 
-        thread t5([&go, &pool, &PERIOD, start] {
+        size_t c5 = 0;
+        thread t5([&go, &pool, &c5, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
             Archer hoyt;
-            for (long x = 0; steady_clock::now() - start <= PERIOD; ++x) {
+            for (c5 = 0; steady_clock::now() - start <= PERIOD; ++c5) {
                 pool.submit(hoyt);
                 std::this_thread::yield();
             }
         });
 
-        thread t6([&go, &pool, &PERIOD, start] {
+        size_t c6 = 0;
+        thread t6([&go, &pool, &c6, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
             Archer hoyt;
-            for (long x = 2; steady_clock::now() - start <= PERIOD; ++x) {
-                future<bool> r = pool.submit(std::bind(hoyt, x));
+            for (c6 = 2; steady_clock::now() - start <= PERIOD; ++c6) {
+                future<bool> r = pool.submit(std::bind(hoyt, c6));
                 std::this_thread::yield();
             }
         });
 
-        thread t7([&go, &pool, &PERIOD, start] {
+        size_t c7 = 0;
+        thread t7([&go, &pool, &c7, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
             Archer hoyt;
-            for (long x = 0; steady_clock::now() - start <= PERIOD; ++x) {
+            for (c7 = 0; steady_clock::now() - start <= PERIOD; ++c7) {
                 pool.submit(std::bind<void(Archer::*)()>(&Archer::shoot, &hoyt));
                 //pool.submit(std::bind(static_cast<void(Archer::*)()>(&Archer::shoot), &hoyt));
                 std::this_thread::yield();
             }
         });
 
-        thread t8([&go, &pool, &PERIOD, start] {
+        size_t c8 = 0;
+        thread t8([&go, &pool, &c8, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
             Archer hoyt;
-            for (long x = 2; steady_clock::now() - start <= PERIOD; ++x) {
-                future<bool> r = pool.submit(std::bind<bool(Archer::*)(long)>(&Archer::shoot, &hoyt, x));
-                //future<bool> r = pool.submit(std::bind(static_cast<bool(Archer::*)(long)>(&Archer::shoot), &hoyt, x));
+            for (c8 = 2; steady_clock::now() - start <= PERIOD; ++c8) {
+                future<bool> r = pool.submit(std::bind<bool(Archer::*)(size_t)>(&Archer::shoot, &hoyt, c8));
+                //future<bool> r = pool.submit(std::bind(static_cast<bool(Archer::*)(size_t)>(&Archer::shoot), &hoyt, c8));
                 std::this_thread::yield();
             }
         });
 
-        thread t9([&go, &pool, &PERIOD, start] {
+        size_t c9 = 0;
+        thread t9([&go, &pool, &c9, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
             std::function<void()> task = static_cast<void(*)()>(shoot);
-            for (long x = 0; steady_clock::now() - start <= PERIOD; ++x) {
+            for (c9 = 0; steady_clock::now() - start <= PERIOD; ++c9) {
                 pool.submit(task);
                 std::this_thread::yield();
             }
         });
 
-        thread t10([&go, &pool, &PERIOD, start] {
+        size_t c10 = 0;
+        thread t10([&go, &pool, &c10, PERIOD, start] {
             while (!go.load(memory_order_acquire))
                 std::this_thread::yield();
-            std::function<bool(long)> task = static_cast<bool(*)(long)>(shoot);
-            for (long x = 2; steady_clock::now() - start <= PERIOD; ++x) {
-                future<bool> r = pool.submit(std::bind(task, x));
+            std::function<bool(size_t)> task = static_cast<bool(*)(size_t)>(shoot);
+            for (c10 = 2; steady_clock::now() - start <= PERIOD; ++c10) {
+                future<bool> r = pool.submit(std::bind(task, c10));
                 std::this_thread::yield();
             }
         });
@@ -338,6 +348,8 @@ int main() {
         t3.join();
         t2.join();
         t1.join();
+
+        std::fprintf(stderr, "\n%zu tasks submitted in total.\n", c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8 + c9 + c10);
     }
 
     time_point<steady_clock> end = steady_clock::now();
