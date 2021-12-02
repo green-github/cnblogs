@@ -179,10 +179,10 @@ class Thread_Pool {
     }
 
     void stop() {
-        size_t remained = _queue_.size();
+        size_t remaining = _queue_.size();
         while (!_queue_.empty())
             std::this_thread::yield();
-        std::fprintf(stderr, "\n%zu tasks remain before destructing pool.\n", remained);
+        std::fprintf(stderr, "\n%zu tasks remain before destructing pool.\n", remaining);
         _done_.store(true, memory_order_release);
         for (unsigned i = 0; i < _workersize_; ++i) {
             if (_workers_[i].joinable())
