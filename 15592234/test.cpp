@@ -1,7 +1,7 @@
 /*
  * test.cpp
  *
- * Testing Lockwise_Shared_Pool.
+ * Testing Thread_Pool.
  *
  */
 

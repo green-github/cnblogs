@@ -1,4 +1,9 @@
-// archery.h
+/*
+ * archery.h
+ *
+ * Callables for testing Thread_Pool.
+ *
+ */
 
 #ifndef ARCHERY_H
 #define ARCHERY_H
@@ -51,3 +56,4 @@ class Archer {
 
 
 #endif
+
