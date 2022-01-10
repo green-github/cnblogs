@@ -12,3 +12,4 @@
 * 15702250 [简单的线程池（六）](https://www.cnblogs.com/green-cnblogs/p/15702250.html)
 * 15710614 [简单的线程池（七）](https://www.cnblogs.com/green-cnblogs/p/15710614.html)
 * 15723078 [简单的线程池（八）](https://www.cnblogs.com/green-cnblogs/p/15723078.html)
+* 15754987 [简单的线程池（九）](https://www.cnblogs.com/green-cnblogs/p/15754987.html)
